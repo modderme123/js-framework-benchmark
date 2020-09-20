@@ -1,0 +1,28 @@
+{
+  "name": "js-framework-benchmark-solid-h2",
+  "version": "0.7.2",
+  "main": "dist/main.js",
+  "js-framework-benchmark": {
+    "frameworkVersionFromPackage": "solid-js"
+  },
+  "scripts": {
+    "build-dev": "rollup -c -w",
+    "build-prod": "rollup -c --environment production"
+  },
+  "author": "Ryan Carniato",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/krausest/js-framework-benchmark",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/krausest/js-framework-benchmark.git"
+  },
+  "dependencies": {
+    "hyper-dom-expressions": "^0.20.6",
+    "solid-js": "^0.19.3"
+  },
+  "devDependencies": {
+    "rollup": "^2.27.1",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "rollup-plugin-terser": "^7.0.2"
+  }
+}
