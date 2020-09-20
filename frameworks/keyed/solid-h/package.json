@@ -17,12 +17,12 @@
     "url": "https://github.com/krausest/js-framework-benchmark.git"
   },
   "dependencies": {
-    "hyper-dom-expressions": "0.9.0",
-    "solid-js": "0.7.2"
+    "hyper-dom-expressions": "^0.20.6",
+    "solid-js": "^0.19.3"
   },
   "devDependencies": {
-    "rollup": "1.12.3",
-    "rollup-plugin-node-resolve": "5.0.0",
-    "rollup-plugin-terser": "5.0.0"
+    "rollup": "^2.27.1",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "rollup-plugin-terser": "^7.0.2"
   }
 }
