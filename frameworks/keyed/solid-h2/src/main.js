@@ -65,12 +65,12 @@ const App = once(() => {
         h('tr', [
           h('td',{class:"col-md-1"}, ()=>rowId),
           h('td',{class:"col-md-4"}, h('a', {onClick: [setSelected, rowId]}, () => row.label)),
-          h('td',{class:"col-md-1"}, h('a', {onClick: [remove, rowId]}, h('span', {class:"glyphicon glyphicon-remove", attrs: {'aria-hidden': true}}))),
+          h('td',{class:"col-md-1"}, h('a', {onClick: [remove, rowId]}, h('span', {class:"glyphicon glyphicon-remove", 'aria-hidden': true}))),
           h('td', {class:'col-md-6'})
         ])))
       })
     )),
-    h('span', {class:'preloadicon glyphicon glyphicon-remove', attrs: {'aria-hidden': true}})
+    h('span', {class:'preloadicon glyphicon glyphicon-remove', 'aria-hidden': true})
   ]);
 
   function remove(id) {
