@@ -10,7 +10,7 @@ function h() {
     } else props = {};
     e.attributes = props;
     let remaining = [].slice.call(args, props || props == null ? 2 : 1);
-    props.children = (remaining.length > 1 ? args : args[0]) || props.children;
+    props.children = (remaining.length > 1 ? remaining : remaining[0]) || props.children;
     return e;
   }
   function item(l) {
@@ -44,7 +44,7 @@ function createVDomEvaluator(r) {
       let attrclone = {};
       for (const attr in x.attributes) {
         let val = x.attributes[attr];
-        if (typeof val === "string") attrclone[attr] = val;
+        if (typeof val !== "function" && typeof val !== "object") attrclone[attr] = val;
       }
       r.assign(e, attrclone, e instanceof SVGElement, true);
       for (const y of x.children) {
@@ -64,7 +64,7 @@ function createVDomEvaluator(r) {
     dynamic = false;
     for (const attr in x.attributes) {
       let val = x.attributes[attr];
-      if (typeof val !== "string") {
+      if (typeof val === "function" || typeof val === "object") {
         attrclone[attr] = val;
         exists = true;
       }
