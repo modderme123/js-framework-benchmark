@@ -48,7 +48,7 @@ const App = () => {
       <table class='table table-hover table-striped test-data'><tbody>
         <${For} each=${data}>${row => {
           let rowId = row.id;
-          return html`<tr class=${'danger'}>
+          return html`<tr className=${()=>isSelected(rowId)?'danger':''}>
             <td class='col-md-1'>${() => rowId}</td>
             <td class='col-md-4'><a onClick=${[setSelected, rowId]}>${row.label}</a></td>
             <td class='col-md-1'><a onClick=${[remove, rowId]}><span class='glyphicon glyphicon-remove' aria-hidden="true" /></a></td>
