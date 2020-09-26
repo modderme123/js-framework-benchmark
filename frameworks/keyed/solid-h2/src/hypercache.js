@@ -1,3 +1,4 @@
+// @ts-check
 import { spread, assign, insert, createComponent, dynamicProperty } from "solid-js/dom";
 
 function isStatic(l) {
@@ -27,7 +28,11 @@ function h(type, props, ...children) {
     props = {};
   }  return { type, children: children.flat(), attributes: props, $h: true };
 }
-
+function addChildren(y){
+  y.attributes.children = y.attributes.children || y.children;
+  if (Array.isArray(y.attributes.children) && y.attributes.children.length == 1)
+    y.attributes.children = y.attributes.children[0];
+}
 function createVDomEvaluator(r) {
   let gid = 0;
   let cache = [];
@@ -61,6 +66,10 @@ function createVDomEvaluator(r) {
     if (isStatic(x)) return e;
     if (x instanceof Element) return x;
     if (typeof x === "function") return r.createComponent(x, undefined);
+    if (typeof x.type === "function") {
+      addChildren(x);
+      return r.createComponent(x.type, x.attributes);
+    }
     let attrclone = {};
     let exists = false,
     dynamic = false;
@@ -88,13 +97,11 @@ function createVDomEvaluator(r) {
             reactifyChildren(y, walk);
             walk = walk && walk.nextSibling;
           } else {
-            // for (const k in y.attributes) {
-            //   if (typeof y.attributes[k] === "function" && !y.attributes[k].length && k !== "children")
-            //   r.dynamicProperty(y.attributes, k);
-            // }
-            y.attributes.children = y.attributes.children || y.children;
-            if (Array.isArray(y.attributes.children) && y.attributes.children.length == 1)
-            y.attributes.children = y.attributes.children[0];
+            addChildren(y);
+            for (const k in y.attributes) {
+              if (typeof y.attributes[k] === "function" && !y.attributes[k].length)
+                r.dynamicProperty(y.attributes, k);
+            }
             r.insert(e, r.createComponent(y.type, y.attributes), walk || multiExpression);
           }
         } else {

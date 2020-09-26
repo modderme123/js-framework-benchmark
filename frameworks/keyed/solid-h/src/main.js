@@ -1,4 +1,5 @@
-import { createSignal, createEffect, createMemo, freeze, sample, mapArray } from 'solid-js';
+// @ts-check
+import { createSignal, createSelector, batch, For } from 'solid-js';
 import { render } from 'solid-js/dom';
 import h from 'solid-js/h';
 
@@ -28,24 +29,10 @@ const Button = ({ id, text, fn }) =>
     }, text)
   );
 
-const List = props => {
-  const mapped = createMemo(mapArray(props.each, props.children));
-  createEffect(tr => {
-    let i, s = props.selected();
-    sample(() => {
-      if (tr) tr.className = "";
-      if ((tr = s && (i = props.each().findIndex(el => el.id === s)) > -1 && mapped()[i]))
-        tr.className = "danger";
-    });
-    return tr;
-  });
-  return mapped;
-};
-
 const App = () => {
-  let rowId;
   const [data, setData] = createSignal([]),
-    [selected, setSelected] = createSignal(null, (a, b) => a === b);
+    [selected, setSelected] = createSignal(null, true),
+    isSelected = createSelector(selected);
 
   return h('.container', [
     h('.jumbotron', h('.row', [
@@ -60,17 +47,17 @@ const App = () => {
       ]))
     ])),
     h('table.table.table-hover.table-striped.test-data', h('tbody',
-      List({each: data, selected, children: row => (
-        rowId = row.id,
-        h('tr', {model: row.id}, [
+      h(For, {each: data}, row => {
+        let rowId = row.id;
+        return h('tr', {class: ()=>isSelected(rowId)?"danger":""}, [
           h('td.col-md-1', row.id),
-          h('td.col-md-4', h('a', {onClick: [setSelected, rowId]}, () => row.label)),
-          h('td.col-md-1', h('a', {onClick: [remove, rowId]}, h('span.glyphicon.glyphicon-remove', {attrs: {'aria-hidden': true}}))),
+          h('td.col-md-4', h('a', {onClick: [setSelected, rowId]}, row.label)),
+          h('td.col-md-1', h('a', {onClick: [remove, rowId]}, h('span.glyphicon.glyphicon-remove', {'aria-hidden': true}))),
           h('td.col-md-6')
-        ]))
+        ])
       })
     )),
-    h('span.preloadicon.glyphicon.glyphicon-remove', {attrs: {'aria-hidden': true}})
+    h('span.preloadicon.glyphicon.glyphicon-remove', {'aria-hidden': true})
   ]);
 
   function remove(id) {
@@ -80,14 +67,14 @@ const App = () => {
   }
 
   function run() {
-    freeze(() => {
+    batch(() => {
       setData(buildData(1000));
       setSelected(null);
     });
   }
 
   function runLots() {
-    freeze(() => {
+    batch(() => {
       setData(buildData(10000));
       setSelected(null);
     });
@@ -96,7 +83,7 @@ const App = () => {
   function add() { setData(data().concat(buildData(1000))); }
 
   function update() {
-    freeze(() => {
+    batch(() => {
       const d = data();
       let index = 0;
       while (index < d.length) {
@@ -117,7 +104,7 @@ const App = () => {
   }
 
   function clear() {
-    freeze(() => {
+    batch(() => {
       setData([]);
       setSelected(null);
     });

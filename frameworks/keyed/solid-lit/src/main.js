@@ -1,4 +1,4 @@
-import { createSignal, createEffect, createMemo, freeze, sample, mapArray } from 'solid-js';
+import { createSignal, createSelector, batch, For } from 'solid-js';
 import html from 'solid-js/html';
 import { render } from 'solid-js/dom';
 
@@ -27,24 +27,10 @@ const Button = ({ id, text, fn }) => html`
   </div>
 `;
 
-const List = props => {
-  const mapped = createMemo(mapArray(props.each, props.children));
-  createEffect(tr => {
-    let i, s = props.selected();
-    sample(() => {
-      if (tr) tr.className = "";
-      if ((tr = s && (i = props.each().findIndex(el => el.id === s)) > -1 && mapped()[i]))
-        tr.className = "danger";
-    });
-    return tr;
-  });
-  return mapped;
-};
-
 const App = () => {
-  let rowId;
   const [data, setData] = createSignal([]),
-    [selected, setSelected] = createSignal(null, (a, b) => a === b);
+    [selected, setSelected] = createSignal(null, true),
+    isSelected = createSelector(selected);
 
   return html`
     <div class='container'>
@@ -59,16 +45,16 @@ const App = () => {
           Button({ id: 'swaprows', text: 'Swap Rows', fn: swapRows })
         ]}</div></div>
       </div></div>
-      <table class='table table-hover table-striped test-data'><tbody>${
-        List({each: data, selected: selected ,children: row => (
-          rowId = row.id,
-          html`<tr>
-            <td class='col-md-1' textContent=${ ()=>rowId } />
-            <td class='col-md-4'><a onClick=${[setSelected, rowId]} textContent=${ row.label } /></td>
+      <table class='table table-hover table-striped test-data'><tbody>
+        <${For} each=${data}>${row => {
+          let rowId = row.id;
+          return html`<tr class=${'danger'}>
+            <td class='col-md-1'>${() => rowId}</td>
+            <td class='col-md-4'><a onClick=${[setSelected, rowId]}>${row.label}</a></td>
             <td class='col-md-1'><a onClick=${[remove, rowId]}><span class='glyphicon glyphicon-remove' aria-hidden="true" /></a></td>
             <td class='col-md-6'/>
           </tr>`
-        )})}
+        }}<//>
       </tbody></table>
       <span class='preloadicon glyphicon glyphicon-remove' aria-hidden="true" />
     </div>
@@ -81,14 +67,14 @@ const App = () => {
   }
 
   function run() {
-    freeze(() => {
+    batch(() => {
       setData(buildData(1000));
       setSelected(null);
     });
   }
 
   function runLots() {
-    freeze(() => {
+    batch(() => {
       setData(buildData(10000));
       setSelected(null);
     });
@@ -97,7 +83,7 @@ const App = () => {
   function add() { setData(data().concat(buildData(1000))); }
 
   function update() {
-    freeze(() => {
+    batch(() => {
       const d = data();
       let index = 0;
       while (index < d.length) {
@@ -118,7 +104,7 @@ const App = () => {
   }
 
   function clear() {
-    freeze(() => {
+    batch(() => {
       setData([]);
       setSelected(null);
     });
